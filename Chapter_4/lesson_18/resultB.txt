@@ -1,0 +1,37 @@
+一排二 数据B 算法结果
+频繁项集： [
+    { support: 19517, items: [ 'gender_male' ] },
+    { support: 7021, items: [ 'clickCardType_seckill' ] },
+    { support: 11139, items: [ 'clickCardType_item_2' ] },
+    { support: 20047, items: [ 'gender_female' ] },
+    { support: 5222, items: [ 'clickCardType_item_1' ] },
+    { support: 5779, items: [ 'clickCardType_banner' ] },
+    { items: [ 'gender_male', 'clickCardType_item_2' ], support: 5527 },
+    { items: [ 'clickCardType_item_2', 'gender_female' ], support: 5612 }
+  ]
+  关联规则： [
+    {
+      antecedent: [ 'gender_male' ],
+      consequent: [ 'clickCardType_item_2' ],
+      support: 0.13969770498432918,
+      confidence: 0.28318901470512886
+    },
+    {
+      antecedent: [ 'clickCardType_item_2' ],
+      consequent: [ 'gender_male' ],
+      support: 0.13969770498432918,
+      confidence: 0.49618457671245175
+    },
+    {
+      antecedent: [ 'clickCardType_item_2' ],
+      consequent: [ 'gender_female' ],
+      support: 0.14184612273784247,
+      confidence: 0.5038154232875482
+    },
+    {
+      antecedent: [ 'gender_female' ],
+      consequent: [ 'clickCardType_item_2' ],
+      support: 0.14184612273784247,
+      confidence: 0.2799421359804459
+    }
+  ]

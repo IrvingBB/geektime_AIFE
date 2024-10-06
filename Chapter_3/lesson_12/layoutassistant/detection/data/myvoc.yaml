@@ -1,0 +1,8 @@
+# 上面那三个txt文件的位置
+train: ./VOCdata/dataSet_path/train.txt
+val: ./VOCdata/dataSet_path/val.txt
+test: ./VOCdata/dataSet_path/test.txt
+# number of classes
+nc: 4   # 修改为自己的类别数量
+# class names
+names: ['op_bar', 'seckill', 'item', 'banner']   # 自己来的类别名称

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前向传播示例</title>
+    <script src="./gpu-browser.min.js"></script> <!-- 引入 gpu.js -->
+</head>
+<body>
+    <h1>前向传播示例</h1>
+    <button onclick="runForwardPass()">运行前向传播</button>
+    <div id="output"></div>
+
+    <script>
+        function runForwardPass() {
+            const gpu = new GPU.GPU(); // 使用 GPU.GPU 创建实例
+
+            const forwardPass = gpu.createKernel(function(weights, input, bias) {
+                let sum = bias[this.thread.y];
+                for (let i = 0; i < this.constants.inputSize; i++) {
+                    sum += input[i] * weights[this.thread.y][i];
+                }
+                return 1 / (1 + Math.exp(-sum)); // 激活函数 Sigmoid
+            })
+            .setOutput([128]) // 输出维度，假设我们有 128 个神经元
+            .setConstants({ inputSize: 784 }); // 假设输入向量维度为 784（如 MNIST 数据）
+
+            const weights = Array(128).fill().map(() => Array(784).fill(Math.random()));
+            const input = Array(784).fill(Math.random());
+            const bias = Array(128).fill(0.1);
+
+            // 执行前向传播
+            const output = forwardPass(weights, input, bias);
+
+            // 显示输出结果
+            document.getElementById('output').innerText = `输出结果：${output.toString()}`;
+            console.log(output);
+        }
+    </script>
+</body>
+</html>

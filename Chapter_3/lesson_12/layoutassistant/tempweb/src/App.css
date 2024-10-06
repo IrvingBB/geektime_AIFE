@@ -1,0 +1,18 @@
+.App {
+  position: relative;
+  background: rgb(235,235,235);
+  box-sizing: border-box;
+  padding: 0 3px 0 3px;
+}
+.logo{
+  width:100%;
+  height:100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  font-size:90px;
+  font-weight: 600;
+  color:rgb(53,53,53);
+  line-height: 80vh;
+}

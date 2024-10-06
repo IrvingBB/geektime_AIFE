@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Data Visualization with Real H5 Page</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            overflow: auto;
+            /* 确保页面可以滚动 */
+            position: relative;
+            /* 设置相对定位，使热力图容器可以覆盖在页面上方 */
+        }
+
+        #heatmapContainer {
+            position: absolute;
+            /* 固定位置，使其始终覆盖在页面上方 */
+            top: 0;
+            left: 0;
+            width: 390px;
+            /* 全宽覆盖 */
+            height: 5000px;
+            /* 全高覆盖 */
+            pointer-events: none;
+            /* 使热力图不可交互，点击事件穿透到下面的H5页面 */
+            z-index: 10;
+            /* 设置较高的z-index，使其在H5页面之上 */
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        #h5Page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 390px;
+            /* 宽度与热力图相同 */
+            height: 5000px;
+            /* 设置H5页面的高度与热力图容器相同 */
+            z-index: 1;
+            /* 设置较低的z-index，使其在热力图容器之下 */
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        img {
+            width: 380px;
+            display: block;
+            margin: 9px 0 9px 0;
+        }
+    </style>
+    <!-- 引入 heatmap.js -->
+    <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
+</head>
+
+<body>
+    <div id="h5Page">
+        <img src="/images/op_bar.png" alt="">
+        <img src="/images/seckill.png" alt="" style="margin-top:30px">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/banner.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+        <img src="/images/item2.png" alt="">
+    </div>
+    <div id="heatmapContainer"></div>
+    <script>
+        // 初始化 heatmap 实例
+        const heatmapInstance = h337.create({
+            container: document.getElementById('heatmapContainer'),
+            radius: 20,
+            maxOpacity: 0.8,
+            minOpacity: 0,
+            blur: 0.75,
+        });
+
+        // 获取 JSON 数据并生成热力图
+        fetch('/data/onetwo_click_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const gender = urlParams.get('gender') || undefined;
+                const ageParam = urlParams.get('age') || undefined;
+                console.log(gender, ageParam);
+                let filteredData = data;
+
+                if (gender || ageParam) {
+                    let ageRange = [0, Infinity];
+                    if (ageParam) {
+                        ageRange = ageParam.split("-").map(Number);
+                    }
+
+                    // 过滤数据
+                    filteredData = data.filter(click => {
+                        const genderMatch = gender ? click.gender === gender : true;
+                        const ageMatch = click.age >= ageRange[0] && click.age <= ageRange[1];
+                        return genderMatch || ageMatch;
+                    });
+                }
+
+                const formattedData = {
+                    max: 10,  // 根据实际数据设置最大值
+                    min: 0,   // 根据实际数据设置最小值
+                    data: filteredData.map(entry => ({
+                        x: entry.clickPosition.x, // 提取 clickPosition 下的 x 值
+                        y: entry.clickPosition.y, // 提取 clickPosition 下的 y 值
+                        value: 1 // 可以根据需求修改值，如将所有点击计为1
+                    }))
+                };
+
+                heatmapInstance.setData(formattedData);
+            })
+            .catch(error => console.error('Error fetching heatmap data:', error));
+
+        // 同步滚动逻辑
+        const syncScroll = () => {
+            const scrollTop = window.scrollY;
+            heatmapContainer.style.transform = `translateY(${-scrollTop}px)`;
+        };
+
+        window.addEventListener('scroll', syncScroll);
+    </script>
+</body>
+
+</html>

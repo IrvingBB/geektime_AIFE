@@ -1,0 +1,40 @@
+一排一 数据A 分析结果
+频繁项集： [
+    { support: 21316, items: [ 'gender_female' ] },
+    { support: 6433, items: [ 'clickCardType_banner' ] },
+    { support: 6379, items: [ 'clickCardType_item_2' ] },
+    { support: 12925, items: [ 'clickCardType_seckill' ] },
+    { support: 21033, items: [ 'gender_male' ] },
+    { support: 4657, items: [ 'clickCardType_item_1' ] },
+    {
+      items: [ 'gender_female', 'clickCardType_seckill' ],
+      support: 6560
+    },
+    { items: [ 'clickCardType_seckill', 'gender_male' ], support: 6365 }
+  ]
+  关联规则： [
+    {
+      antecedent: [ 'gender_female' ],
+      consequent: [ 'clickCardType_seckill' ],
+      support: 0.15490330350185363,
+      confidence: 0.3077500469131169
+    },
+    {
+      antecedent: [ 'clickCardType_seckill' ],
+      consequent: [ 'gender_female' ],
+      support: 0.15490330350185363,
+      confidence: 0.5075435203094778
+    },
+    {
+      antecedent: [ 'clickCardType_seckill' ],
+      consequent: [ 'gender_male' ],
+      support: 0.15029870835202722,
+      confidence: 0.49245647969052225
+    },
+    {
+      antecedent: [ 'gender_male' ],
+      consequent: [ 'clickCardType_seckill' ],
+      support: 0.15029870835202722,
+      confidence: 0.3026196928635953
+    }
+  ]

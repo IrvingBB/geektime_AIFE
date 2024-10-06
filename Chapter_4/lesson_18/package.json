@@ -1,0 +1,21 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "decision-tree": "^0.3.7",
+    "mathjs": "^13.1.1",
+    "ml-cart": "^2.1.1",
+    "ml-kmeans": "^6.0.0",
+    "node-apriori": "^1.0.0",
+    "node-kmeans": "^1.1.9",
+    "scikit-learn": "^0.1.0",
+    "synaptic": "^1.1.4"
+  }
+}

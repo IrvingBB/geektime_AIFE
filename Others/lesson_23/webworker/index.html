@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobileNet Inference</title>
+    <!-- 引入 TensorFlow.js 库 -->
+    <script src="./tf.js"></script>
+</head>
+
+<body>
+    <script>
+        window.onload = function () {
+            // 确保 TensorFlow.js 库已经加载
+            if (typeof tf === 'undefined') {
+                console.error('TensorFlow.js library not loaded');
+                return;
+            }
+
+            // 创建 Worker
+            const modelWorker = new Worker('./modelWorker.js');
+
+            // 生成随机输入数据
+            const inputTensor = tf.randomNormal([1, 224, 224, 3]);
+            const inputData = inputTensor.dataSync(); // 转换为扁平数组
+
+            // 向 Worker 发送输入数据
+            modelWorker.postMessage({ input: inputData });
+
+            // 接收模型推理结果
+            modelWorker.onmessage = function (event) {
+                console.log('Model inference result:', event.data);
+            };
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <img id="image" src="your test image link" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script>
+        async function loadModelAndPredict() {
+            // 加载预训练的MobileNet模型
+            const model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+
+            // 获取图像元素
+            const image = document.getElementById('image');
+
+            // 将图像转换为Tensor
+            let tensor = tf.browser.fromPixels(image)
+                .resizeNearestNeighbor([224, 224]) // 改变图像大小以匹配模型的输入尺寸
+                .toFloat()
+                .expandDims(); // 增加一个维度以匹配模型的输入
+
+            // 使用MobileNet模型提取特征
+            const prediction = model.predict(tensor);
+
+            // 输出特征
+            prediction.print();
+        }
+
+        loadModelAndPredict();
+    </script>
+</body>
+
+</html>

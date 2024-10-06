@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser-based Neural Network</title>
+  <script src="./brain.js"></script>
+</head>
+<body>
+  <input type="file" id="trainFiles" multiple>
+  <input type="file" id="testFile">
+  <button id="trainButton">Train Model</button>
+  <button id="testButton">Test Model</button>
+  <div id="log"></div>
+  <script>
+    const loadImageData = (file) => {
+      return new Promise((resolve, reject) => {
+        // Load the image data from the file
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            // Draw the image onto a canvas and extract the pixel data
+            const canvas = document.createElement('canvas');
+            canvas.width = 28;
+            canvas.height = 28;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 28, 28);
+            const imageData = ctx.getImageData(0, 0, 28, 28);
+            const data = [];
+            for (let i = 0; i < imageData.data.length; i += 4) {
+              data.push(imageData.data[i] / 255); // Normalize the pixel value
+            }
+            resolve(data);
+          };
+          img.src = event.target.result;
+        };
+        reader.onerror = reject;
+        // Read the file as a data URL
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const loadTrainData = async (files) => {
+      const trainData = [];
+      const categories = ['text', 'input', 'button'];
+
+      for (const file of files) {
+        const category = categories.find(cat => file.name.includes(cat));
+        if (category) {
+          const imageData = await loadImageData(file);
+          if (imageData) {
+            trainData.push({
+              input: imageData,
+              output: { [category]: 1 }
+            });
+          } else {
+            console.error(`Failed to load image data for file: ${file.name}`);
+          }
+        } else {
+          console.error(`No category found for file: ${file.name}`);
+        }
+      }
+
+      return trainData;
+    };
+
+    const trainModel = async (trainData) => {
+      const net = new brain.NeuralNetwork();
+      net.train(trainData, {
+        // iterations: 4500,
+        iterations: 1000,
+        log: (details) => {
+          console.log(details);
+          // document.getElementById('log').innerText += `\n${JSON.stringify(details)}`;
+        },
+        logPeriod: 1,
+        learningRate: 0.01
+      });
+      return net;
+    };
+
+    const testModel = async (net, file) => {
+      const testImageData = await loadImageData(file);
+      const output = net.run(testImageData);
+      console.log(`Prediction: ${JSON.stringify(output)}`);
+    };
+
+    // Event listeners for the buttons to train and test the model
+    document.getElementById('trainButton').addEventListener('click', async () => {
+      const trainFiles = document.getElementById('trainFiles').files;
+      const trainData = await loadTrainData(trainFiles);
+      const net = await trainModel(trainData);
+      window.net = net; // Save the trained model to the global scope
+    });
+
+    document.getElementById('testButton').addEventListener('click', async () => {
+      const testFile = document.getElementById('testFile').files[0];
+      if (window.net) {
+        await testModel(window.net, testFile);
+      } else {
+        console.log('Please train the model first.');
+      }
+    });
+  </script>
+</body>
+</html>

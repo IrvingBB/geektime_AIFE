@@ -1,0 +1,1 @@
+To make it easier to find, the code is organized according to the course structure.

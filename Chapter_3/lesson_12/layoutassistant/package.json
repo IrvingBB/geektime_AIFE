@@ -1,0 +1,25 @@
+{
+  "name": "intelligent-layout-assistant",
+  "version": "1.0.0",
+  "description": "A intelligent layout solution by AI to create a page layout automaticly",
+  "main": "app.js",
+  "scripts": {
+    "test": "test",
+    "codegen": "node ./bin/index",
+    "start": "node app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "no"
+  },
+  "keywords": [
+    "layout"
+  ],
+  "author": "Edward.liu",
+  "license": "ISC",
+  "dependencies": {
+    "md5": "^2.3.0",
+    "shelljs": "^0.8.5",
+    "watch": "^1.0.2"
+  }
+}

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGLM2 Personal Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e5e5e5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #chat-container {
+            width: 70%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            max-width: 100%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+            background-color: #f0f0f0;
+            color: #333;
+            position: relative;
+        }
+
+        .bubble.user {
+            background-color: #07c160;
+            color: #ffffff;
+            border-bottom-right-radius: 0;
+            border-top-left-radius: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .bubble.bot {
+            background-color: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 20px;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+            margin-top: 5px;
+        }
+
+        .message.user .bubble {
+            margin-right: 10px;
+            /* Add margin between the user's avatar and message bubble */
+        }
+
+        .message.bot .bubble {
+            margin-left: 10px;
+            /* Add margin between the bot's avatar and message bubble */
+        }
+
+        .message.user .avatar {
+            margin-left: 10px;
+            /* Add margin to the left of the user's avatar */
+        }
+
+        .message.bot .avatar {
+            margin-right: 10px;
+            /* Add margin to the right of the bot's avatar */
+        }
+
+        #input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        #prompt {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #send {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 20px;
+            border: none;
+            background-color: #07c160;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            margin-left: 5px;
+            height: 1em;
+            vertical-align: middle;
+        }
+
+        .loading span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 50%;
+            margin: 0 2px;
+            opacity: 0;
+            animation: loading 0.8s infinite;
+        }
+
+        .loading span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Custom scrollbar styles */
+        #messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        #messages::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 10px;
+            border: 2px solid #f0f0f0;
+        }
+
+        #messages::-webkit-scrollbar-thumb:hover {
+            background-color: #888;
+        }
+
+        /* Responsive design for small screens */
+        @media (max-width: 500px) {
+            #chat-container {
+                width: 95%;
+            }
+
+            .avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .bubble {
+                max-width: calc(100% - 50px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <h2 style="text-align: center;">ChatGLM2 Personal Assistant</h2>
+        <div id="messages"></div>
+        <div id="input-container">
+            <input type="text" id="prompt" placeholder="Type your message here..." />
+            <button id="send">
+                <!-- Airplane icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M21.992 2.22a.75.75 0 0 0-.755-.122L2.993 9.978a.75.75 0 0 0-.045 1.388l7.468 2.9 2.9 7.468a.75.75 0 0 0 1.387-.045l7.88-18.244a.75.75 0 0 0-.11-.765Zm-5.583 2.905-8.835 8.835 5.608-2.178 3.227-6.657ZM12.04 17.96l-1.883-4.85 8.835-8.835-6.657 3.227-2.178 5.608-4.85-1.883 15.733-6.113-8.835 8.835 1.883 4.85Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // List of random avatar images
+        const avatarUrls = [
+            'https://randomuser.me/api/portraits/lego/1.jpg',
+            'https://randomuser.me/api/portraits/lego/2.jpg',
+            'https://randomuser.me/api/portraits/lego/3.jpg',
+            'https://randomuser.me/api/portraits/lego/4.jpg',
+            'https://randomuser.me/api/portraits/lego/5.jpg',
+            'https://randomuser.me/api/portraits/lego/6.jpg',
+            'https://randomuser.me/api/portraits/lego/7.jpg',
+            'https://randomuser.me/api/portraits/lego/8.jpg',
+            'https://randomuser.me/api/portraits/lego/9.jpg',
+            'https://randomuser.me/api/portraits/lego/10.jpg'
+        ];
+
+        // Randomly assign avatars to the user and bot
+        const userAvatar = avatarUrls[Math.floor(Math.random() * avatarUrls.length)];
+        const botAvatar = avatarUrls[Math.floor(Math.random() * avatarUrls.length)];
+
+
+        function formatMessage(text) {
+            return text.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
+        }
+
+        function addMessage(text, className, isUser) {
+            const messageContainer = document.getElementById('messages');
+            const message = document.createElement('div');
+            message.className = `message ${className}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.style.backgroundImage = `url(${isUser ? userAvatar : botAvatar})`;
+            message.appendChild(avatar);
+
+            const bubble = document.createElement('div');
+            bubble.className = `bubble ${className}`;
+            bubble.innerHTML = formatMessage(text); // Use innerHTML to render HTML
+            message.appendChild(bubble);
+
+            if (isUser) {
+                message.insertBefore(bubble, avatar);
+            }
+
+            messageContainer.appendChild(message);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const promptElement = document.getElementById('prompt');
+            const prompt = promptElement.value;
+            if (!prompt) return;
+
+            addMessage(prompt, 'user', true);
+            promptElement.value = '';
+
+            const responseMessage = document.createElement('div');
+            responseMessage.className = 'message bot';
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.style.backgroundImage = `url(${botAvatar})`;
+            responseMessage.appendChild(avatar);
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble bot';
+            bubble.innerHTML = '<span class="loading"><span></span><span></span><span></span></span>';
+            responseMessage.appendChild(bubble);
+            document.getElementById('messages').appendChild(responseMessage);
+
+            try {
+                const response = await fetch('http://localhost:8000/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        history: [],
+                        max_length: 2048,
+                        top_p: 0.7,
+                        temperature: 0.95,
+                    }),
+                });
+
+                const data = await response.json();
+                bubble.innerHTML = formatMessage(data.response); // Use innerHTML to render HTML
+
+            } catch (error) {
+                bubble.innerHTML = `Error: ${error.message}`; // Use innerHTML for error messages
+            }
+
+            const messageContainer = document.getElementById('messages');
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+
+        document.getElementById('send').addEventListener('click', sendMessage);
+
+        // Support Enter key to send message
+        document.getElementById('prompt').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>

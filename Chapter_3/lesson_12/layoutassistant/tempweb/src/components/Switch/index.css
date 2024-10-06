@@ -1,0 +1,10 @@
+.Switch {
+    width: 200px;
+    height: 35px;
+    background: rgb(245, 245, 245);
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

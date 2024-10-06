@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./brain.js"></script>
+</head>
+<body>
+    <script>
+        // prepare training data
+        const data = [
+            { "input": "implementing a caching mechanism improves performance", "output": "backend" },
+            { "input": "hover effects on buttons", "output": "frontend" },
+            { "input": "optimizing SQL queries", "output": "backend" },
+            { "input": "using flexbox for layout", "output": "frontend" },
+            { "input": "setting up a CI/CD pipeline", "output": "backend" },
+            { "input": "SVG animations for interactive graphics", "output": "frontend" },
+            { "input": "authentication using OAuth", "output": "backend" },
+            { "input": "responsive images for different screen sizes", "output": "frontend" },
+            { "input": "creating REST API endpoints", "output": "backend" },
+            { "input": "CSS grid for complex layouts", "output": "frontend" },
+            { "input": "database normalization for efficiency", "output": "backend" },
+            { "input": "custom form validation", "output": "frontend" },
+            { "input": "implementing web sockets for real-time communication", "output": "backend" },
+            { "input": "parallax scrolling effect", "output": "frontend" },
+            { "input": "securely storing user passwords", "output": "backend" },
+            { "input": "creating a theme switcher (dark/light mode)", "output": "frontend" },
+            { "input": "load balancing for high traffic", "output": "backend" },
+            { "input": "accessibility features for disabled users", "output": "frontend" },
+            { "input": "scalable architecture for growing user base", "output": "backend" }
+        ];
+        // Create a recurrent neural network
+        const network = new brain.recurrent.LSTM();
+        // Train the network
+        network.train(data, {
+            iterations: 2000,
+            log: true,
+            logPeriod: 100
+        });
+        // Make a prediction
+        const output = network.run('data access layer is not presentation layer');
+        console.log(`Category: ${output}`); // backend
+    </script>
+</body>
+</html>

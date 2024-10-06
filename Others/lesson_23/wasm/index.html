@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斐波那契性能测试</title>
+    <script src="fibonacci.js"></script> <!-- 确保包含正确编译的 JS 文件 -->
+</head>
+<body>
+    <h1>斐波那契性能测试：WebAssembly 与 JavaScript</h1>
+    <button onclick="runFibonacci()">运行斐波那契</button>
+    <div id="wasm-output"></div>
+    <div id="js-output"></div>
+
+    <script>
+        let wasmFibonacci;
+
+        // 加载 WebAssembly 模块
+        async function loadWasm() {
+            const module = await new Promise((resolve, reject) => {
+                Module.onRuntimeInitialized = () => resolve(Module);
+            });
+            // 包装 WebAssembly 模块中的 'fibonacci' 函数
+            wasmFibonacci = module.cwrap('fibonacci', 'number', ['number']);
+        }
+
+        // JavaScript 版本的斐波那契函数
+        function fibonacciJS(n) {
+            if (n <= 1) return n;
+            return fibonacciJS(n - 1) + fibonacciJS(n - 2);
+        }
+
+        // 运行 WebAssembly 和 JavaScript 版本并测量执行时间
+        async function runFibonacci() {
+            const n = 40;  // 用于比较性能的大斐波那契数
+
+            // 确保 WebAssembly 模块已加载
+            if (!wasmFibonacci) {
+                alert('WebAssembly 模块尚未加载');
+                return;
+            }
+
+            // 运行 WebAssembly 斐波那契
+            const wasmStart = performance.now();
+            const wasmResult = wasmFibonacci(n);
+            const wasmEnd = performance.now();
+            document.getElementById('wasm-output').innerText = 
+                `WebAssembly 结果：${wasmResult}，时间：${wasmEnd - wasmStart} 毫秒`;
+
+            // 运行 JavaScript 斐波那契
+            const jsStart = performance.now();
+            const jsResult = fibonacciJS(n);
+            const jsEnd = performance.now();
+            document.getElementById('js-output').innerText = 
+                `JavaScript 结果：${jsResult}，时间：${jsEnd - jsStart} 毫秒`;
+        }
+
+        // 页面加载时加载 WebAssembly 模块
+        loadWasm();
+    </script>
+</body>
+</html>

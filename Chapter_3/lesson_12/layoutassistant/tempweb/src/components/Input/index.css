@@ -1,0 +1,28 @@
+.Input{
+    width:200px;
+    height:30px;
+    background: none;
+    outline: none;
+    /* border: 1px solid gray; */
+    border: none;
+    position: absolute;
+    background: rgb(245, 245, 245);
+    border-radius: 4px;
+    border:2px solid #DBDBDB;
+    text-indent: 13px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--apux-input-text-color, #1F1F1F);
+}
+.Input:hover{
+    border:2px solid #BABABA;
+}
+.Input:focus{
+    border:2px solid #DBDBDB;
+    outline: 2px solid  #2934FF;
+}
+.Input:active{
+    border:2px solid #9E9E9E;
+    background: rgba(0, 0, 0, 0.16);
+    outline: none;
+}

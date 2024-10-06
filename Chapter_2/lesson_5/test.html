@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handwritten Digit Recognition with LeNet</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Handwritten Digit Recognition with LeNet</h1>
+  <canvas id="canvas" width="280" height="280"></canvas>
+  <br>
+  <button onclick="clearCanvas()">Clear</button>
+  <button onclick="predict()">Predict</button>
+  <p id="result"></p>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    canvas.addEventListener('mousedown', () => { isDrawing = true; });
+    canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(event) {
+      if (!isDrawing) return;
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'black';
+
+      ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    async function predict() {
+      const model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-examples/mnist-acgan/dist/generator/model.json');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const tensor = tf.browser.fromPixels(imageData, 1)
+        .resizeNearestNeighbor([28, 28])
+        .mean(2)
+        .expandDims(0)
+        .expandDims(-1)
+        .toFloat()
+        .div(tf.scalar(255.0));
+
+      // Ensure the tensor is an array if the model expects multiple inputs
+      const prediction = model.predict([tensor]);
+      const predictedValue = prediction.argMax(1).dataSync()[0];
+      document.getElementById('result').innerText = `Predicted Digit: ${predictedValue}`;
+    }
+  </script>
+</body>
+</html>
